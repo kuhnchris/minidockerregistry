@@ -6,3 +6,5 @@ services:
     expose: 
       - 8080
     container_name: registry
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock 

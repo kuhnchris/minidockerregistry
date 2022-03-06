@@ -18,7 +18,7 @@ docker-compose up -d
 
 ## Using github container registry (ghcr.io)
 
-`docker run ghcr.io/kuhnchris/minidockerregistry:latest`
+`docker run ghcr.io/kuhnchris/minidockerregistry:latest -v /var/run/docker.sock:/var/run/docker.sock`
 
 ## Local deployment:
 
