@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <title>Docker IP directory</title>
+    <link href="{{url_for('static', filename = 'style.css')}}" rel="stylesheet">
+    <meta http-equiv="refresh" content="60">
+  </head>
+  <body>
+    {% for entry in entries %}
+    <div class="box" style="background-color: {{ n2c(entry["name"]) }}">
+      <div class="title">
+        {{ entry.name }}
+      </div>
+      <div class="content">
+        {% for ip in entry["ips"] %}
+        <div class="colapsable">
+          <div class="title">
+            {{ ip }}
+          </div>
+          <div class="ports">
+            {% for port in entry["ports"] %}
+            <div class="portentry">
+              <div class="portnr">:{{ port.ljust(5) }}</div>
+              <a href="http://{{ ip }}:{{ port }}" target="_blank" >http</a>
+              <a href="https://{{ ip }}:{{ port }}" target="_blank" >https</a>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <div>
+    You are {{ request.remote_addr }}<BR>
+    Requesting: {{ request.path }} via {{ request.method }}
+    </div>
+  </body>
+</html>
