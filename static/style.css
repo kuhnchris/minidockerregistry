@@ -1,11 +1,14 @@
 body {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 14px;
+    background-color: lightyellow;
+}
+#content {
+
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    background-color: lightyellow;
-}
+    }
 .title {
     font-size: 15px;
     font-weight: bold;

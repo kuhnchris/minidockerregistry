@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <title>Docker IP directory</title>
+    <link href="{{url_for('static', filename = 'style.css')}}" rel="stylesheet">
+    <script src="{{url_for('static', filename = 'nunjucks.min.js')}}"></script>
+  <script src="{{url_for('static', filename = 'registry.js')}}"></script>
+</head>
+ <body>
+    <div id="content" style="width:100%"></div><BR>
+    <div>
+    You are {{ request.remote_addr }}<BR>
+    Requesting: {{ request.path }} via {{ request.method }}
+    </div>
+  </body>
+</html>

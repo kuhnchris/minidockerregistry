@@ -1,48 +1,68 @@
-import docker
 import hashlib
-from flask import Flask
-from flask import render_template
-from flask import request, redirect
+import logging
+import docker
+from threading import Thread
+from time import sleep
+from flask import Flask, jsonify, render_template, request, redirect
 
-app = Flask(__name__, template_folder=".")
+logger = logging.getLogger(__name__)
+app = Flask(__name__, template_folder=".",
+            static_url_path='/static/',
+            static_folder='static/')
+
+entries = []
+
+
+def fetchDockerInfo():
+    while True:
+        logger.info("fetching Docker info...")
+        client = docker.from_env()
+        for c in client.containers():
+            entry = {"name": ", ".join(c["Names"]), "ips": [], "ports": [], "created": c["Created"]}
+            networkSettings = c["NetworkSettings"]["Networks"]
+            for k in networkSettings.keys():
+                ip = networkSettings[k]["IPAddress"]
+                entry["ips"].append(ip)
+
+            for p in c["Ports"]:
+                if p["Type"] == "tcp":
+                    prvPort = str(p["PrivatePort"])
+                    if prvPort not in entry["ports"]:
+                        entry["ports"].append(prvPort)
+
+            entry["ports"].sort()
+            entries.append(entry)
+        entries.sort(key=lambda sortEntry: sortEntry["created"])
+        sleep(5)
+
+
+dockerFetchTask = Thread(target=fetchDockerInfo)
+dockerFetchTask.daemon = True
+dockerFetchTask.run()
+
 
 def name2color(name):
-  code = str(hashlib.md5(name.encode('utf-8')).hexdigest())
-  return "rgba("+str(int(code[0:2],16))+","+str(int(code[2:4],16))+","+str(int(code[4:6],16))+",.5)"
-  #return code
+    code = str(hashlib.md5(name.encode('utf-8')).hexdigest())
+    return "rgba(" + str(int(code[0:2], 16)) + "," + str(int(code[2:4], 16)) + "," + str(int(code[4:6], 16)) + ",.5)"
+
 
 @app.errorhandler(404)
 def get404(error):
-    print(request.path)
-    entries = getDockerEntries()
+    logger.warning("404 -> {}".format(request.path))
     for i in entries:
         if i["name"] == request.path:
-            return redirect("http://"+i["ips"][0]+":"+i["ports"][0])
-    return renderResponse()
+            return redirect("http://" + i["ips"][0] + ":" + i["ports"][0])
+    return renderIndexFile()
+
 
 @app.route("/")
-def getAll():
-    return renderResponse()
+def getIndexFile():
+    return renderIndexFile()
 
-def getDockerEntries():
-    entries = []
-    client = docker.from_env()
-    for c in client.containers():
-        entry = { "name":"", "ips":[], "ports": []}
-        entry["name"] = ", ".join(c["Names"])
-        nwrks = c["NetworkSettings"]["Networks"]
-        for k in nwrks.keys():
-            ip=nwrks[k]["IPAddress"]
-            entry["ips"].append(ip)
 
-        for p in c["Ports"]:
-            if p["Type"] == "tcp":
-                entry["ports"].append(str(p["PrivatePort"]))
-    #    print()
-    #    print(c["Ports"])
-        entries.append(entry)
-    return entries
+@app.route("/api/getEntries")
+def getEntries():
+    return jsonify(entries)
 
-def renderResponse():
-    entries = getDockerEntries()
-    return render_template('template.j2',entries=entries, n2c=name2color, request=request)
+def renderIndexFile():
+    return render_template('index.html')
