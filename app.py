@@ -2,7 +2,7 @@ import hashlib
 import logging
 import docker
 import dnslib.server
-from dnslib import RR
+from dnslib import RR, RCODE
 from threading import Thread
 from time import sleep
 from flask import Flask, jsonify, render_template, request, redirect
@@ -55,21 +55,27 @@ logger.info("creating DNS Resolver...")
 class DockerResolver(dnslib.server.BaseResolver):
     def resolve(self, dnsRequest, handler):
         reply = dnsRequest.reply()
+        found = False
         for q in dnsRequest.questions:
             try:
                 if len(q.qname.label) >= 3:
                     if q.qname.label[-1].decode("UTF-8") == "local" and \
                             q.qname.label[-2].decode("UTF-8") == "vpn":
-                        cmpstr = "/" + q.qname.label[-3].decode("UTF-8")
+                        compareString = "/" + q.qname.label[-3].decode("UTF-8")
                         for e in entries:
                             try:
-                                if e["name"] == cmpstr or cmpstr == "/*":
+                                if e["name"] == compareString or compareString == "/*":
                                     for ip in e["ips"]:
                                         reply.add_answer(*RR.fromZone(str(e["name"][1:]) + ".vpn.local. 5 A " + ip))
+                                        found = True
                             except Exception as err2:
                                 logger.error("Error processing docker entry {} - {}".format(e["name"],err2))
             except Exception as err:
                 logger.error("Error processing questions in DNS request! - {}".format(err))
+
+        if found is False:
+            reply.header.rcode = RCODE.NXDOMAIN
+
         return reply
 
 
