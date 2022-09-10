@@ -1,7 +1,15 @@
 # Docker Overview
 
 This is a little dashboard to show what IPs your docker containers have.
-Particulary useful for using a VPN within a docker network (for example with combination with pihole).
+Particularly useful for using a VPN within a docker network (for example with combination with pihole).
+
+Update 2022: This now also includes an integrated DNS server to use with `pihole`, as all the "common" workarounds are... stupid.
+Now you can simply add your favorite DNS prefix (currently hardcoded as "vpn.local") and
+dig all your domains either by `dig -x *.vpn.local` (returns all services) or `dig -x container-name.vpn.local` to get the current IP of the service you want to access.
+
+The whole reason for this is, that there are django apps that do not like domains which are not RFC conform. I would have used the local DNS
+of docker (basically: `service.docker_network_name`, for example: `nginx.vpn_network`), but, again, not RFC conform, so `django` is throwing hands.
+
 
 ## Deployment options
 
@@ -18,7 +26,7 @@ docker-compose up -d
 
 ## Using github container registry (ghcr.io)
 
-`docker run ghcr.io/kuhnchris/minidockerregistry:latest -v /var/run/docker.sock:/var/run/docker.sock`
+`docker run ghcr.io/kuhnchris/minidockerregistry:latest -v /var/run/docker.sock:/var/run/docker.sock -p 8080:5000`
 
 ## Local deployment:
 
@@ -32,10 +40,11 @@ Requirements:
 
 Access the app using http://localhost:5000
 
-Want to have it accessable not just from localhost?
-Replace `flask run` with `flask run --host=0.0.0.0`.
+- `Q`: Want to have it accessible not just from `localhost`?
+- `A`: Replace `flask run` with `flask run --host=0.0.0.0`.
 
-Want autoreloading for development?
-Replace `flask run` with `FLASK_ENV=development flask run`
 
-Runing auto-reload without localhost-restriction is not recommended.
+- `Q`: Want auto-reloading for development?
+- `A`: Replace `flask run` with `FLASK_ENV=development flask run`
+
+Running `auto-reload` without `localhost-restriction` is not recommended.

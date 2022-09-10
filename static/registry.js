@@ -42,3 +42,4 @@ function processEntries(response){
 
 }
 
+loadEntries();
