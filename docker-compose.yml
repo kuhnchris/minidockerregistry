@@ -4,7 +4,17 @@ services:
   registry:
     build: .
     expose: 
-      - 8080
+      - 80
+      - 53/udp
+      - 53/tcp
     container_name: registry
+    environment:
+      - LOCAL_DOMAIN="dev.local"
+      - DNS_PORT=53
+      - HTTP_PORT=80
+      - HTTP_HOST=0.0.0.0
+      - ENABLE_DNS=true
+      - ENABLE_HTTP=true
+      - ENABLE_FLASK_DEBUG=False
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock 
