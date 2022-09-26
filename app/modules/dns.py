@@ -1,7 +1,7 @@
 import dnslib.server
 import os
 import logging
-from dnslib import RR, RCODE
+from dnslib import RR, RCODE, DNSRecord
 from .common import Common
 
 logger = logging.getLogger(__name__)
@@ -11,9 +11,16 @@ class DockerDNSResolverClass():
         DockerDNSResolverClass.dnsPort = int(os.environ.get("DNS_PORT", 53))
         DockerDNSResolverClass.prepareLocalDomain()
 
-        logger.info("started DNS server on port {}".format(DockerDNSResolverClass.dnsPort))
+        logger.info("started DNS server on port {}".format(DockerDNSResolverClass.dnsPort))        
         DockerDNSResolverClass.DNSlogger = dnslib.server.DNSLogger(prefix=False, logf=logger.debug)
         DockerDNSResolverClass.dockerResolverObj = DockerDNSResolverClass.DockerResolver()
+        
+        DockerDNSResolverClass.upstreamDNS = os.environ.get("DNS_UPSTREAM_HOST","8.8.8.8")
+        DockerDNSResolverClass.upstreamDNSPort = int(os.environ.get("DNS_UPSTREAM_PORT",53))
+        DockerDNSResolverClass.ProxyDNSRequests = False if os.environ.get("ENABLE_DNS_PROXY", "false").lower == "false" else True
+        
+        if DockerDNSResolverClass.ProxyDNSRequests:
+            logger.info("Proxying unresolvable DNS requests to: {}/{}".format(DockerDNSResolverClass.upstreamDNS, DockerDNSResolverClass.upstreamDNSPort))
 
         DockerDNSResolverClass.dnsServer = dnslib.server.DNSServer(resolver=DockerDNSResolverClass.dockerResolverObj, port=DockerDNSResolverClass.dnsPort, logger=DockerDNSResolverClass.DNSlogger)
         DockerDNSResolverClass.dnsServer.start_thread()
@@ -62,8 +69,15 @@ class DockerDNSResolverClass():
                     logger.error("Error processing questions in DNS request! - {}".format(err))
 
             if found is False:
-                reply.header.rcode = RCODE.NXDOMAIN
-
+                if DockerDNSResolverClass.ProxyDNSRequests:
+                    try:
+                        proxy_req = dnsRequest.send(DockerDNSResolverClass.upstreamDNS,DockerDNSResolverClass.upstreamDNSPort)
+                        reply = DNSRecord.parse(proxy_req)
+                    except:
+                        reply.header.rcode = RCODE.NXDOMAIN
+                else:
+                    reply.header.rcode = RCODE.NXDOMAIN
+                    
             return reply
 
 

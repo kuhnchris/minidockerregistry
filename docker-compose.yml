@@ -3,18 +3,22 @@ version: '3'
 services:
   registry:
     build: .
-    expose: 
-      - 80
-      - 53/udp
-      - 53/tcp
     container_name: registry
     environment:
-      - LOCAL_DOMAIN="dev.local"
+      - LOCAL_DOMAIN=dev.local
       - DNS_PORT=53
       - HTTP_PORT=80
       - HTTP_HOST=0.0.0.0
       - ENABLE_DNS=true
       - ENABLE_HTTP=true
       - ENABLE_FLASK_DEBUG=False
+      - ENABLE_DNS_PROXY=true
+      - DNS_UPSTREAM_HOST=8.8.8.8
+      - DNS_UPSTREAM_PORT=53
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock 
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 53:53/udp
+      - 53:53/tcp
+      - 80:80
+    entrypoint: ["pipenv","run","python","app/app.py","--log-level=DEBUG"]
