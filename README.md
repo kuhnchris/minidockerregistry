@@ -8,9 +8,6 @@ The whole reason for this is, that there are `django` apps that do not like doma
 
 **Update 2022 #2**: Due to needing this for myself (mostly due to developing Matrix bots) I actually took the time to refactor this project into modules and include options to enable and disable services via environment parameters. Please check the included `docker-compose.yml` for more options.
 
-**Update 2022 #3**: Adding Upstream proxifying, or, in layman's terms: If our DNS server does not have a resolve for the request, send it to the upstream server, if configured. With this you can use the server as an entire drop-in replacement DNS server. Additionally: automatically build and publish powered by `github actions`
-
-
 ## Deployment options
 
 - Docker (build)
@@ -49,19 +46,20 @@ docker-compose up -d
     - Make sure to `\` the `*` to avoid shell expandation
 - To enable `auto-reload` set the environment variable `ENABLE_FLASK_DEBUG` to any value that is not `"False"`.
 
-### Supported enviromental flags:
+### Supported environment flags:
 
 |Module|Variable|Default Value|Explanation|
 |-|-|-|-|
 ||||**Parameters**|
 |DNS|LOCAL_DOMAIN|vpn.local|The DNS domain the DNS server responds to|
 |DNS|DNS_PORT|53|DNS server port|
-|DNS|DNS_UPSTREAM_HOST|`8.8.8.8`|Upstream DNS server|
-|DNS|DNS_UPSTREAM_PORT|53|Upstream DNS server port|
+|DNS|DNS_UPSTREAM_HOST|\<none\>|Which DNS servers to call for non-local domains, separated by ";", for example `"8.8.8.8:53;4.4.4.4:53"`|
+|DNS|DNS_UPSTREAM_TRY_ALL|True|Try all of the DNS servers|
 |HTTP|HTTP_PORT|8080|HTTP port|
 |HTTP|HTTP_HOST|localhost|HTTP host to listen to |
 ||||**Flags**|
 |DNS|ENABLE_DNS|False|Enables the DNS module & server|
-|DNS|ENABLE_DNS_PROXY|False|Enable upstream proxying|
+|DNS|ENABLE_DNS_PROXY|False|Enable proxying not-locally-found entries to upstream DNS server(s)|
 |HTTP|ENABLE_HTTP|False|Enables the HTTP module & server|
 |HTTP|ENABLE_FLASK_DEBUG|False|Enable `auto_reload` and `werkzeug` debug mode|
+

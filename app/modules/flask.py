@@ -6,15 +6,15 @@ import os
 logger = logging.getLogger(__name__)
 
 
-class FlaskModule:        
+class FlaskModule:
     def startApp():
         baseDir = os.path.dirname(os.path.realpath(__file__)) + "/../"
         httpPort = os.environ.get("HTTP_PORT", 8080)
-        httpHost = os.environ.get("HTTP_HOST","localhost")
-        flaskDebug = False if os.environ.get("ENABLE_FLASK_DEBUG","False").lower() == "false" else True
-        
+        httpHost = os.environ.get("HTTP_HOST", "localhost")
+        flaskDebug = False if os.environ.get("ENABLE_FLASK_DEBUG", "False").lower() == "false" else True
+
         logger.info("Starting flask web server on {} port {} - http://{}:{}/".format(httpHost, httpPort, httpHost, httpPort))
-        app = Flask(__name__, 
+        app = Flask(__name__,
                     template_folder=baseDir + "files/",
                     static_url_path='/static/',
                     static_folder=baseDir + '/files/static/')
@@ -45,11 +45,9 @@ class FlaskModule:
     def name2colorRoute(name):
         return jsonify({name: FlaskModule.name2color(name)})
 
-
     def renderIndexFile():
         return render_template('index.html')
 
     def name2color(name):
         code = str(hashlib.md5(name.encode('utf-8')).hexdigest())
         return "rgba(" + str(int(code[0:2], 16)) + "," + str(int(code[2:4], 16)) + "," + str(int(code[4:6], 16)) + ",.5)"
-

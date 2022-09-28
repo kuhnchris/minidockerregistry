@@ -12,5 +12,6 @@ logging.basicConfig(format='%(asctime)s - %(name)-30s - %(levelname)-10s - %(mes
 logger = logging.getLogger(__name__)
 logger.debug("Setting up logger basic info for all to use.")
 
+
 class Common:
     entries = []

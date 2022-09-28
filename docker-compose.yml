@@ -12,11 +12,12 @@ services:
       - ENABLE_DNS=true
       - ENABLE_HTTP=true
       - ENABLE_FLASK_DEBUG=False
-      - ENABLE_DNS_PROXY=true
-      - DNS_UPSTREAM_HOST=8.8.8.8
-      - DNS_UPSTREAM_PORT=53
+      - ENABLE_DNS_PROXY=True
+      - DNS_UPSTREAM_TRY_ALL=True
+      - DNS_UPSTREAM_HOST=8.8.8.8:53;10.44.0.1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./app:/app/app # for development
     ports:
       - 53:53/udp
       - 53:53/tcp

@@ -5,22 +5,22 @@ from time import sleep
 from .common import Common
 logger = logging.getLogger(__name__)
 
+
 class DockerInfoGatheringClass():
     dockerClient = None
     dockerFetchTask = None
-    
-    def startThread():   
+
+    def startThread():
         DockerInfoGatheringClass.dockerFetchTask = Thread(target=DockerInfoGatheringClass.endlessLoop)
         DockerInfoGatheringClass.dockerFetchTask.daemon = True
         DockerInfoGatheringClass.dockerFetchTask.start()
-    
+
     def getDockerClient():
-        if DockerInfoGatheringClass.dockerClient == None:
+        if DockerInfoGatheringClass.dockerClient is None:
             DockerInfoGatheringClass.dockerClient = docker.from_env()
-        
+
         return DockerInfoGatheringClass.dockerClient
-            
-        
+
     def endlessLoop():
         logger.info("Starting docker fetching endless loop")
         while True:
@@ -54,5 +54,3 @@ class DockerInfoGatheringClass():
             Common.entries = Common.entries + entries
         except Exception as e:
             logger.error("Exception occurred in dockerInfoFetcher thread! - {}".format(e))
-
-

@@ -1,4 +1,4 @@
-from modules import common
+from modules import common  # noqa: F401
 from modules import flask
 from modules import docker
 from modules import dns
