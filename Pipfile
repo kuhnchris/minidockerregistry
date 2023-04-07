@@ -7,6 +7,8 @@ name = "pypi"
 dnslib = "*"
 docker-py = "*"
 flask = "*"
+cryptography = "*"
+podman = {file = "https://github.com/containers/podman-py/archive/refs/heads/main.zip"}
 
 [dev-packages]
 flake8 = "*"
