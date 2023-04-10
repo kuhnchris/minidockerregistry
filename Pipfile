@@ -8,7 +8,8 @@ dnslib = "*"
 docker-py = "*"
 flask = "*"
 cryptography = "*"
-podman = {file = "https://github.com/containers/podman-py/archive/refs/heads/main.zip"}
+podman = {file = "https://github.com/containers/podman-py/releases/download/v4.4.1/podman-4.4.1-py3-none-any.whl"}
+pydantic = "*"
 
 [dev-packages]
 flake8 = "*"

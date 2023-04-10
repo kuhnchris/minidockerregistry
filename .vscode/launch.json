@@ -1,0 +1,37 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch LOCAL",
+            "type": "python",
+            "request": "launch",
+            "program": "main.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "ENABLE_HTTP": "TRUE",
+                "DOCKER_HOST": "unix://${workspaceFolder}/podman.sock",
+                "ENABLE_FLASK_DEBUG": "true",
+                "HTTP_HOST": "0.0.0.0"
+            }
+        },
+        {
+            "name": "Launch via proxy",
+            "type": "python",
+            "request": "launch",
+            "program": "app.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "ENABLE_HTTP": "TRUE",
+                "DOCKER_HOST": "unix://${workspaceFolder}/podman.sock",
+                "SCRIPT_NAME": "/proxy/8080",
+                "ENABLE_FLASK_DEBUG": "true",
+                "APPLICATION_ROOT": "/proxy/8080" // for url_for...
+            }
+        }
+    ]
+}
