@@ -3,6 +3,6 @@ RUN apk update && apk add --no-cache python3 python3-dev py3-pip && pip install 
 RUN mkdir /app
 WORKDIR /app
 COPY . /app
-RUN pipenv install
+RUN pipenv --python=/usr/bin/python install
 ENTRYPOINT ["pipenv","run","python","app/app.py"]
 EXPOSE 53 80
